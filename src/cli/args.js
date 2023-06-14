@@ -2,10 +2,18 @@ const parseArgs = () => {
     const args = process.argv.slice(2);
     const parsedArgs = {};
   
-    for (let i = 0; i < args.length; i += 2) {
-      const propName = args[i].slice(2);
-      const value = args[i + 1];
-      parsedArgs[propName] = value;
+    let i = 0;
+    while (i < args.length) {
+      const arg = args[i];
+      if (arg.startsWith('--')) {
+        const propName = arg.slice(2);
+        const value = args[i + 1];
+        parsedArgs[propName] = value;
+        i += 2;
+      } else {
+        console.error(`Invalid argument: ${arg}`);
+        i += 1;
+      }
     }
   
     for (const propName in parsedArgs) {
