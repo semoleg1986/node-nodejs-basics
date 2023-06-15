@@ -1,37 +1,27 @@
-import { promises as fs, readdir } from 'fs';
-import { join } from 'path';
+import { promises as fs } from 'fs';
 import { fileURLToPath } from 'url';
-import path from 'path';
 
 const copy = async () => {
-    const sourceFolder = 'files';
-    const targetFolder = 'files_copy';
-
-    const filePath = fileURLToPath(import.meta.url);
-    const directoryPath = path.dirname(filePath);
-    const sourceFolderC = path.join(directoryPath);
+    const FOLDER = 'files';
+    const COPY_FOLDER = 'files_copy';
+    const folderPath = new URL(`${FOLDER}`,import.meta.url)
+    const copyFolderPath = new URL(`${COPY_FOLDER}`,import.meta.url)
 
     try {
-        const sourceFolderPath = await fs.realpath(`${sourceFolderC}/${sourceFolder}`);
+        await fs.access(folderPath);
         try {
-            await fs.access(targetFolder);
+            await fs.access(COPY_FOLDER);
         } catch(err){
-            await fs.mkdir(`${sourceFolderC}/${targetFolder}`);
-            console.log(err)
+            await fs.mkdir(copyFolderPath);
         }
-        const files = await fs.readdir(`${sourceFolderC}/${sourceFolder}`);
+        const files = await fs.readdir(folderPath);
         for (const file of files){
-            const sourcePath = join(`${sourceFolderC}/${sourceFolder}`, file);
-            const targetPath = join(`${sourceFolderC}/${targetFolder}`, file);
-            await fs.copyFile(sourcePath, targetPath);
+            await fs.copyFile(fileURLToPath(`${folderPath}/${file}`), fileURLToPath(`${copyFolderPath}/${file}`));
         }
     }
     catch(err){
         console.log('FS operation failed')
     }
-        
-  
   };
-
 
 await copy();
