@@ -1,17 +1,22 @@
 import path from 'path';
 import { release, version } from 'os';
 import { createServer as createServerHttp } from 'http';
-import './files/c.js';
 import { readFile } from 'fs/promises';
 
 const random = Math.random();
 
 let unknownObject;
 
-if (random > 0.5) {
-  unknownObject = await readFile('./files/a.json', 'utf8');
-} else {
-  unknownObject = await readFile('./files/b.json', 'utf8');
+try {
+  if (random > 0.5) {
+    unknownObject = await readFile(new URL('files/a.json',import.meta.url), 'utf-8');
+  } else {
+    unknownObject = await readFile(new URL('files/b.json',import.meta.url), 'utf-8');
+  }
+
+  console.log(unknownObject);
+} catch (error) {
+  console.error('Error reading JSON file:', error);
 }
 
 console.log(`Release ${release()}`);
@@ -26,8 +31,6 @@ const myServer = createServerHttp((_, res) => {
 });
 
 const PORT = 3000;
-
-console.log(unknownObject);
 
 myServer.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
