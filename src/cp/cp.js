@@ -5,13 +5,15 @@ const FILE = 'script.js'
 const fileURL = new URL(`${FOLDER}/${FILE}`,import.meta.url)
 
 const spawnChildProcess = async (args) => {
-    const childProcess = fork(fileURL, args, { silent: true });
+    const child = fork(fileURL, args, { stdio: 'pipe' });
 
-    process.stdin.pipe(childProcess.stdin);
-    childProcess.stdout.pipe(process.stdout);
 
-    childProcess.stdout.on('data', chunk => {
-        process.stdout.write(`Received from child process: ${chunk}`)
+    process.stdin.pipe(child.stdin);
+    child.stdout.pipe(process.stdout);
+  
+    child.on('close', (code) => {
+      console.log(`Child process exited with code ${code}`);
     });
-};
-spawnChildProcess();
+  };
+  
+await spawnChildProcess(['arg1', 'arg2']);
